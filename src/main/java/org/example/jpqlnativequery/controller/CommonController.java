@@ -93,9 +93,20 @@ public class CommonController {
     public List<UserAddressDto> getUserAddressById(@PathVariable Long userId) {
         return commonService.getUserAddressById(userId);
     }
+
     @GetMapping("/user-name")
     public List<User> getUserName(@RequestParam("name") String name) {
         return commonService.getUserByName(name);
+    }
+
+    @GetMapping("/has-user")
+    public boolean hasUser(@RequestParam("name") String name) {
+        return commonService.hasUser(name);
+    }
+
+    @GetMapping("/has-user-address")
+    public List<User> hasUserAddress(@RequestParam("street") String street) {
+        return commonService.hasUserByAddress(street);
     }
 }
 

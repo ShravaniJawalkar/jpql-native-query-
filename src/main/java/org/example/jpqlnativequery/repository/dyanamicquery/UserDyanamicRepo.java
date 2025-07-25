@@ -4,14 +4,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.example.jpqlnativequery.model.User;
 import org.example.jpqlnativequery.model.UserAddressDto;
 import org.example.jpqlnativequery.model.UserOrderDto;
+import org.example.jpqlnativequery.repository.specificationapi.UserSpecification;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -110,5 +109,19 @@ public class UserDyanamicRepo {
             throw new RuntimeException("No user found with name: " + userName);
         }
         return results;
+    }
+
+    public boolean hasUser(String userName) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<User> user = cb.createQuery(User.class);
+        Root<User> root = user.from(User.class);
+        UserSpecification userSpecification = new UserSpecification();
+        Specification<User> userSpecification1 = userSpecification.hasUserName(userName).and(userSpecification.joinAddress());
+        Predicate predicate = userSpecification1.toPredicate(root, user, cb);
+        user.select(root).where(predicate);
+        TypedQuery<User> typedQuery = em.createQuery(user);
+        List<User> results = typedQuery.getResultList();
+
+        return !results.isEmpty();
     }
 }

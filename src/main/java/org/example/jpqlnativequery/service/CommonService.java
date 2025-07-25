@@ -6,10 +6,12 @@ import org.example.jpqlnativequery.repository.OrderRepository;
 import org.example.jpqlnativequery.repository.ProductRepository;
 import org.example.jpqlnativequery.repository.UserRepository;
 import org.example.jpqlnativequery.repository.dyanamicquery.UserDyanamicRepo;
+import org.example.jpqlnativequery.repository.specificationapi.UserSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -187,5 +189,18 @@ public class CommonService {
     public List<User> getUserByName(String name) {
         return userDyanamicRepo.getUserByNameInOrder(name);
     }
+
+    public boolean hasUser(String name) {
+        return userDyanamicRepo.hasUser(name);
+    }
+
+    public List<User> hasUserByAddress(String address) {
+        Specification<User> spec = new UserSpecification().joinAddress().and(
+                new UserSpecification().hasStreet(address)
+        );
+        return userRepository.findAll(spec);
+
+    }
+
 }
 
